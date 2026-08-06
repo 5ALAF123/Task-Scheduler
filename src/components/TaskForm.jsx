@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const STATUS_LABELS = {
-  'todo': 'To Do',
-  'in-progress': 'In Progress',
-  'done': 'Done',
+  todo: "To Do",
+  "in-progress": "In Progress",
+  done: "Done",
 };
 
-const emptyForm = { title: '', duration: 1, status: 'todo' };
+const emptyForm = { title: "", duration: 1, status: "todo" };
 
 export default function TaskForm({ onSubmit, onCancel, initial }) {
   const [form, setForm] = useState(initial || emptyForm);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -20,16 +20,16 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (!form.title.trim()) {
-      setError('Please enter a task title');
+      setError("Please enter a task title");
       return;
     }
-    setError('');
+    setError("");
     onSubmit({ ...form, title: form.title.trim() });
   }
 
   return (
     <form className="task-form" onSubmit={handleSubmit}>
-      <h3>{initial ? 'Edit Task' : 'New Task'}</h3>
+      <h3>{initial ? "Edit Task" : "New Task"}</h3>
 
       <label>
         Title
@@ -43,7 +43,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
       </label>
 
       <label>
-        Duration (hours)
+        Duration (hours.minutes)
         <input
           type="number"
           name="duration"
@@ -61,7 +61,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
             <button
               key={key}
               type="button"
-              className={`status-btn status-${key} ${form.status === key ? 'active' : ''}`}
+              className={`status-btn status-${key} ${form.status === key ? "active" : ""}`}
               onClick={() => setForm((prev) => ({ ...prev, status: key }))}
             >
               {label}
@@ -74,7 +74,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
 
       <div className="form-actions">
         <button type="submit" className="btn-primary">
-          {initial ? 'Save' : 'Add'}
+          {initial ? "Save" : "Add"}
         </button>
         <button type="button" className="btn-secondary" onClick={onCancel}>
           Cancel
