@@ -6,7 +6,7 @@ const STATUS_LABELS = {
   done: "Done",
 };
 
-const emptyForm = { title: "", duration: "1.00", status: "todo" };
+const emptyForm = { title: "", duration: "", status: "todo" };
 
 function minutesToHm(minutes) {
   const h = Math.floor(minutes / 60);
@@ -27,7 +27,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
     ...initial,
     duration: initial?.duration
       ? minutesToHm(Number(initial.duration))
-      : emptyForm.duration,
+      : "",
   }));
   const [error, setError] = useState("");
 
@@ -42,7 +42,9 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
       setError("Please enter a task title");
       return;
     }
-    if (hmToMinutes(form.duration) <= 0) {
+    const durationText = String(form.duration).trim();
+    const duration = durationText ? hmToMinutes(durationText) : 0;
+    if (durationText && duration <= 0) {
       setError("Please enter a valid duration");
       return;
     }
@@ -50,7 +52,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
     onSubmit({
       ...form,
       title: form.title.trim(),
-      duration: hmToMinutes(form.duration),
+      duration,
     });
   }
 
