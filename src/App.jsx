@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import useTasks from "./hooks/useTasks";
 import TaskForm from "./components/TaskForm";
 
@@ -8,10 +8,20 @@ const COLUMNS = [
   { key: "done", label: "Done", css: "col-done" },
 ];
 
+const DONE_DELETE_MS = 30000;
+
 function formatDuration(minutes) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${h}:${String(m).padStart(2, "0")}`;
+}
+
+function formatCountdown(totalSeconds) {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  const mmss = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return h > 0 ? `${h}:${mmss}` : mmss;
 }
 
 export default function App() {
@@ -19,6 +29,12 @@ export default function App() {
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [defaultStatus, setDefaultStatus] = useState("todo");
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, []);
 
   function handleAddRequest(status) {
     setEditingTask(null);
@@ -110,6 +126,31 @@ export default function App() {
                         {formatDuration(task.duration)}
                       </span>
                     )}
+                    {task.status === "done" && task.doneAt && (
+                      <span className="task-countdown">
+                        deleting in{" "}
+                        {Math.max(
+                          0,
+                          Math.ceil((task.doneAt + DONE_DELETE_MS - now) / 1000),
+                        )}
+                        s
+                      </span>
+                    )}
+                    {task.status === "in-progress" &&
+                      task.duration &&
+                      task.inProgressAt && (
+                        <span className="task-timer">
+                          {formatCountdown(
+                            Math.max(
+                              0,
+                              Math.floor(
+                                task.duration * 60 -
+                                  (now - task.inProgressAt) / 1000,
+                              ),
+                            ),
+                          )}
+                        </span>
+                      )}
                   </button>
                 ))}
                 <button

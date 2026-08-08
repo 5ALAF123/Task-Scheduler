@@ -165,6 +165,31 @@ body {
   margin-top: 2px;
 }
 
+.task-countdown {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--danger, #dc2626);
+  border: 1px solid var(--danger, #dc2626);
+  border-radius: 999px;
+  padding: 2px 8px;
+  align-self: flex-start;
+}
+
+.task-timer {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--progress, #d97706);
+  border: 1px solid var(--progress, #d97706);
+  border-radius: 999px;
+  padding: 2px 8px;
+  align-self: flex-start;
+}
+
 .kanban-add {
   background: transparent;
   border: 1px dashed var(--border);
