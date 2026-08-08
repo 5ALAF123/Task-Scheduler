@@ -19,11 +19,15 @@ export default function Auth({ onSuccess }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data.error || `Request failed (${res.status})`);
       }
       onSuccess(data.user);
     } catch (err) {
-      setError(err.message);
+      setError(
+        err.message === "Failed to fetch"
+          ? "Cannot reach the server. Make sure it is running (npm run dev)."
+          : err.message,
+      );
     } finally {
       setSubmitting(false);
     }
