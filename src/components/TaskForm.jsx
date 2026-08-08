@@ -50,7 +50,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
           value={form.duration}
           onChange={handleChange}
           min="0.1"
-          step="0.5"
+          step="0.1"
         />
       </label>
 
