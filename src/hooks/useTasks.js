@@ -9,7 +9,10 @@ function loadTasks() {
     return tasks.map((t) => ({
       ...t,
       status: t.status === 'pending' ? 'todo' : t.status,
-      duration: t.duration > 10 ? Math.round(t.duration / 60 * 10) / 10 : t.duration,
+      duration:
+        t.duration <= 10
+          ? Math.round(Number(t.duration) * 60)
+          : t.duration,
     }));
   } catch {
     return [];

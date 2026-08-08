@@ -6,10 +6,29 @@ const STATUS_LABELS = {
   done: "Done",
 };
 
-const emptyForm = { title: "", duration: 1, status: "todo" };
+const emptyForm = { title: "", duration: "1.00", status: "todo" };
+
+function minutesToHm(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}.${String(m).padStart(2, "0")}`;
+}
+
+function hmToMinutes(value) {
+  const parts = String(value).trim().split(".");
+  const h = parseInt(parts[0], 10) || 0;
+  const m = Math.min(parseInt(parts[1] || "0", 10) || 0, 59);
+  return h * 60 + m;
+}
 
 export default function TaskForm({ onSubmit, onCancel, initial }) {
-  const [form, setForm] = useState(initial || emptyForm);
+  const [form, setForm] = useState(() => ({
+    ...emptyForm,
+    ...initial,
+    duration: initial?.duration
+      ? minutesToHm(Number(initial.duration))
+      : emptyForm.duration,
+  }));
   const [error, setError] = useState("");
 
   function handleChange(e) {
@@ -23,8 +42,16 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
       setError("Please enter a task title");
       return;
     }
+    if (hmToMinutes(form.duration) <= 0) {
+      setError("Please enter a valid duration");
+      return;
+    }
     setError("");
-    onSubmit({ ...form, title: form.title.trim() });
+    onSubmit({
+      ...form,
+      title: form.title.trim(),
+      duration: hmToMinutes(form.duration),
+    });
   }
 
   return (
@@ -43,14 +70,13 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
       </label>
 
       <label>
-        Duration (hours.min)
+        Duration (hours.minutes)
         <input
-          type="number"
+          type="text"
           name="duration"
           value={form.duration}
           onChange={handleChange}
-          min="0.1"
-          step="0.1"
+          placeholder="e.g. 1.30"
         />
       </label>
 

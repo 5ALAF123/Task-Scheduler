@@ -8,10 +8,10 @@ const COLUMNS = [
   { key: 'done', label: 'Done', css: 'col-done' },
 ];
 
-function formatDuration(hours) {
-  const h = Math.floor(hours);
-  const m = Math.round((hours - h) * 60);
-  return `${h}:${String(m).padStart(2, '0')}`;
+function formatDuration(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}:${String(m).padStart(2, "0")}`;
 }
 
 export default function App() {
@@ -131,7 +131,7 @@ export default function App() {
                       duration: editingTask.duration,
                       status: editingTask.status,
                     }
-                  : { title: '', duration: 1, status: defaultStatus }
+                  : { title: '', duration: 60, status: defaultStatus }
               }
             />
             {editingTask && (
