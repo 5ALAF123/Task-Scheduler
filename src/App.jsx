@@ -32,6 +32,14 @@ export default function App() {
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [now, setNow] = useState(Date.now());
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("task-scheduler-theme") || "light",
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("task-scheduler-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 250);
@@ -93,6 +101,12 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>Task Scheduler</h1>
+        <button
+          className="theme-btn"
+          onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+        >
+          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+        </button>
       </header>
 
       <div className="kanban">
