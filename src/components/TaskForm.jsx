@@ -72,13 +72,13 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
       </label>
 
       <label>
-        Duration (hours.minutes)
+        Duration
         <input
           type="text"
           name="duration"
           value={form.duration}
           onChange={handleChange}
-          placeholder="e.g. 1.30"
+          placeholder=""
         />
       </label>
 
