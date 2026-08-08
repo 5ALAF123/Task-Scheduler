@@ -25,9 +25,7 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
   const [form, setForm] = useState(() => ({
     ...emptyForm,
     ...initial,
-    duration: initial?.duration
-      ? minutesToHm(Number(initial.duration))
-      : "",
+    duration: initial?.duration ? minutesToHm(Number(initial.duration)) : "",
   }));
   const [error, setError] = useState("");
 
@@ -72,13 +70,13 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
       </label>
 
       <label>
-        Duration
+        Duration (hours.minutes)
         <input
           type="text"
           name="duration"
           value={form.duration}
           onChange={handleChange}
-          placeholder=""
+          placeholder="e.g. 1.30"
         />
       </label>
 
