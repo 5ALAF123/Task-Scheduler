@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { ensureSchema, getUserByName, getUserById, createUser, listTasks, getTask, createTask, updateTask, deleteTask, deleteAllTasks } from './db.js';
+import { ensureSchema, getUserByName, getUserById, createUser, listTasks, getTask, createTask, updateTask, deleteTask, deleteAllTasks, pool } from './db.js';
 
 const isProd = process.env.NODE_ENV === 'production';
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 const wrap = (fn) => (req, res) => fn(req, res).catch((e) => {
   console.error(e);
-  res.status(500).json({ error: 'Server error' });
+  res.status(500).json({ error: 'Server error', detail: e.message });
 });
 
 function signAndSetCookie(res, userId) {
@@ -76,7 +76,7 @@ function loginRateLimit(req, res, next) {
 
 function mapTask(t) {
   return {
-    id: t.id,
+    id: Number(t.id),
     title: t.title,
     duration: t.duration,
     status: t.status,
@@ -87,6 +87,24 @@ function mapTask(t) {
 
 function createApiRouter() {
   const router = express.Router();
+
+  router.get('/health', wrap(async (req, res) => {
+    const envs = {
+      hasPostgresUrl: !!process.env.POSTGRES_URL,
+      hasPostgresUrlNonPooling: !!process.env.POSTGRES_URL_NON_POOLING,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      nodeEnv: process.env.NODE_ENV || 'not-set',
+    };
+    let db;
+    try {
+      await pool.query('SELECT 1');
+      db = 'ok';
+    } catch (e) {
+      db = e.message;
+    }
+    res.json({ envs, db });
+  }));
 
   router.post('/register', loginRateLimit, wrap(async (req, res) => {
     const username = String((req.body && req.body.username) || '').trim();
@@ -189,7 +207,7 @@ function createApiRouter() {
 
   router.put('/tasks/:id', requireAuth, wrap(async (req, res) => {
     const task = await getTask(Number(req.params.id));
-    if (!task || task.user_id !== req.userId) {
+    if (!task || Number(task.user_id) !== Number(req.userId)) {
       return res.status(404).json({ error: 'Task not found.' });
     }
 
@@ -228,7 +246,7 @@ function createApiRouter() {
 
   router.delete('/tasks/:id', requireAuth, wrap(async (req, res) => {
     const task = await getTask(Number(req.params.id));
-    if (!task || task.user_id !== req.userId) {
+    if (!task || Number(task.user_id) !== Number(req.userId)) {
       return res.status(404).json({ error: 'Task not found.' });
     }
     await deleteTask(task.id);
