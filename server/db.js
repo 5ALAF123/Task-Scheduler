@@ -34,17 +34,12 @@ export async function ensureSchema() {
       title TEXT NOT NULL,
       duration INTEGER NOT NULL DEFAULT 0,
       status TEXT NOT NULL DEFAULT 'todo',
-      priority INTEGER NOT NULL DEFAULT 0,
       in_progress_at BIGINT,
       done_at BIGINT,
       created_at BIGINT NOT NULL
     );
 
     CREATE INDEX IF NOT EXISTS idx_tasks_user ON tasks(user_id);
-  `);
-
-  await pool.query(`
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority INTEGER NOT NULL DEFAULT 0;
   `);
 }
 
@@ -79,16 +74,16 @@ export async function getTask(id) {
   return rows[0];
 }
 
-export async function createTask(userId, title, duration, status, priority = 0) {
+export async function createTask(userId, title, duration, status) {
   const { rows } = await pool.query(
-    'INSERT INTO tasks (user_id, title, duration, status, priority, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-    [userId, title, duration, status, priority, Date.now()],
+    'INSERT INTO tasks (user_id, title, duration, status, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+    [userId, title, duration, status, Date.now()],
   );
   return Number(rows[0].id);
 }
 
 export async function updateTask(id, updates) {
-  const allowed = ['title', 'duration', 'status', 'priority', 'in_progress_at', 'done_at'];
+  const allowed = ['title', 'duration', 'status', 'in_progress_at', 'done_at'];
   const entries = Object.entries(updates).filter(([k]) => allowed.includes(k));
   if (entries.length === 0) return;
   const sets = entries.map(([k], i) => `${k} = $${i + 1}`).join(', ');

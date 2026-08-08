@@ -80,7 +80,6 @@ function mapTask(t) {
     title: t.title,
     duration: t.duration,
     status: t.status,
-    priority: t.priority,
     inProgressAt: t.in_progress_at,
     doneAt: t.done_at,
   };
@@ -194,8 +193,6 @@ function createApiRouter() {
     const status = VALID_STATUSES.includes(req.body && req.body.status)
       ? req.body.status
       : 'todo';
-    const priority = Number(req.body && req.body.priority);
-    const validPriority = Number.isInteger(priority) && priority >= 0 && priority <= 3 ? priority : 0;
 
     if (!title) {
       return res.status(400).json({ error: 'Title is required.' });
@@ -204,7 +201,7 @@ function createApiRouter() {
       return res.status(400).json({ error: 'Invalid duration.' });
     }
 
-    const id = await createTask(req.userId, title, duration, status, validPriority);
+    const id = await createTask(req.userId, title, duration, status);
     res.json({ task: mapTask(await getTask(id)) });
   }));
 
@@ -230,13 +227,6 @@ function createApiRouter() {
         return res.status(400).json({ error: 'Invalid status.' });
       }
       updates.status = req.body.status;
-    }
-    if (req.body.priority !== undefined) {
-      const priority = Number(req.body.priority);
-      if (!Number.isInteger(priority) || priority < 0 || priority > 3) {
-        return res.status(400).json({ error: 'Invalid priority.' });
-      }
-      updates.priority = priority;
     }
 
     if (updates.status === 'done') {
