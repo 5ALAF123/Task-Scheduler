@@ -20,6 +20,9 @@
   --col-progress: #eab308;
   --col-done: #22c55e;
   --progress: #d97706;
+  --prio-low: #0ea5e9;
+  --prio-medium: #eab308;
+  --prio-high: #ef4444;
 }
 
 :root[data-theme="dark"] {
@@ -35,6 +38,9 @@
   --col-progress: #facc15;
   --col-done: #4ade80;
   --progress: #fb923c;
+  --prio-low: #38bdf8;
+  --prio-medium: #facc15;
+  --prio-high: #f87171;
 }
 
 html {
@@ -58,6 +64,65 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.board-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+}
+
+.priority-badge {
+  align-self: flex-start;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin-top: 4px;
+}
+
+.priority-badge.prio-1 {
+  color: var(--prio-low);
+  background: color-mix(in srgb, var(--prio-low) 12%, transparent);
+}
+
+.priority-badge.prio-2 {
+  color: var(--prio-medium);
+  background: color-mix(in srgb, var(--prio-medium) 12%, transparent);
+}
+
+.priority-badge.prio-3 {
+  color: var(--prio-high);
+  background: color-mix(in srgb, var(--prio-high) 12%, transparent);
+}
+
+.task-card.overdue .task-timer {
+  color: var(--danger, #dc2626);
+  border-color: var(--danger, #dc2626);
+}
+
+.task-card.overdue {
+  border-left-color: var(--danger, #dc2626);
 }
 
 .app-header {
@@ -405,9 +470,26 @@ body {
   color: var(--col-done);
 }
 
+.status-btn.prio-1.active {
+  border-color: var(--prio-low);
+  color: var(--prio-low);
+}
+
+.status-btn.prio-2.active {
+  border-color: var(--prio-medium);
+  color: var(--prio-medium);
+}
+
+.status-btn.prio-3.active {
+  border-color: var(--prio-high);
+  color: var(--prio-high);
+}
+
 .app-footer {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
   font-size: 0.8rem;
   color: var(--text-dim);
   padding: 8px 4px;

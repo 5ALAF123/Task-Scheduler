@@ -10,6 +10,13 @@ const COLUMNS = [
 
 const DONE_DELETE_MS = 30000;
 
+const PRIORITY_LABELS = {
+  0: "None",
+  1: "Low",
+  2: "Medium",
+  3: "High",
+};
+
 function formatDuration(minutes) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -33,6 +40,7 @@ export default function Board({ user, onLogout }) {
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [now, setNow] = useState(Date.now());
+  const [search, setSearch] = useState("");
   const [theme, setTheme] = useState(
     () => localStorage.getItem("task-scheduler-theme") || "dark",
   );
@@ -98,6 +106,20 @@ export default function Board({ user, onLogout }) {
     updateTask(Number(taskId), { status: newStatus });
   }
 
+  const query = search.trim().toLowerCase();
+  const visibleTasks = query
+    ? tasks.filter((t) => t.title.toLowerCase().includes(query))
+    : tasks;
+
+  const sortedByPriority = (list) =>
+    list.slice().sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+  const stats = {
+    total: tasks.length,
+    inProgress: tasks.filter((t) => t.status === "in-progress").length,
+    done: tasks.filter((t) => t.status === "done").length,
+  };
+
   return (
     <div className="app">
       <header className="app-header">
@@ -119,85 +141,109 @@ export default function Board({ user, onLogout }) {
       {loading ? (
         <div className="auth-loading">Loading tasks...</div>
       ) : (
-        <div className="kanban">
-          {COLUMNS.map((col) => {
-            const colTasks = tasks.filter((t) => t.status === col.key);
-            return (
-              <div
-                key={col.key}
-                className={`kanban-col ${col.css}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.dataTransfer.dropEffect = "move";
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const taskId = e.dataTransfer.getData("text/plain");
-                  if (taskId) handleDrop(taskId, col.key);
-                }}
-              >
-                <div className="kanban-col-header">
-                  <span>{col.label}</span>
-                  <span className="kanban-count">{colTasks.length}</span>
-                </div>
-                <div className="kanban-col-body">
-                  {colTasks.map((task) => (
-                    <button
-                      key={task.id}
-                      className={`task-card status-${task.status}`}
-                      draggable="true"
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData("text/plain", task.id);
-                        e.dataTransfer.effectAllowed = "move";
-                      }}
-                      onClick={() => handleTaskClick(task)}
-                    >
-                      <span className="task-title">{task.title}</span>
-                      {task.duration && (
-                        <span className="task-duration-label">time</span>
-                      )}
-                      {task.duration && (
-                        <span className="task-duration">
-                          {formatDuration(task.duration)}
-                        </span>
-                      )}
-                      {task.status === "done" && task.doneAt && (
-                        <span className="task-countdown">
-                          deleting in{" "}
-                          {Math.max(
-                            0,
-                            Math.ceil((task.doneAt + DONE_DELETE_MS - now) / 1000),
-                          )}
-                          s
-                        </span>
-                      )}
-                      {task.status === "in-progress" &&
+        <div className="board-wrap">
+          <div className="board-toolbar">
+            <input
+              className="search-input"
+              type="search"
+              placeholder="Search tasks..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="kanban">
+            {COLUMNS.map((col) => {
+              const colTasks = sortedByPriority(
+                visibleTasks.filter((t) => t.status === col.key),
+              );
+              return (
+                <div
+                  key={col.key}
+                  className={`kanban-col ${col.css}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const taskId = e.dataTransfer.getData("text/plain");
+                    if (taskId) handleDrop(taskId, col.key);
+                  }}
+                >
+                  <div className="kanban-col-header">
+                    <span>{col.label}</span>
+                    <span className="kanban-count">{colTasks.length}</span>
+                  </div>
+                  <div className="kanban-col-body">
+                    {colTasks.map((task) => {
+                      const overdue =
+                        task.status === "in-progress" &&
                         task.duration &&
-                        task.inProgressAt && (
-                          <span className="task-timer">
-                            {formatCountdown(
-                              Math.max(
+                        task.inProgressAt &&
+                        now - task.inProgressAt >= task.duration * 60000;
+                      return (
+                        <button
+                          key={task.id}
+                          className={`task-card status-${task.status}${overdue ? " overdue" : ""}`}
+                          draggable="true"
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/plain", task.id);
+                            e.dataTransfer.effectAllowed = "move";
+                          }}
+                          onClick={() => handleTaskClick(task)}
+                        >
+                          <span className="task-title">{task.title}</span>
+                          {task.priority ? (
+                            <span className={`priority-badge prio-${task.priority}`}>
+                              {PRIORITY_LABELS[task.priority]}
+                            </span>
+                          ) : null}
+                          {task.duration ? (
+                            <span className="task-duration">
+                              {formatDuration(task.duration)}
+                            </span>
+                          ) : null}
+                          {task.status === "done" && task.doneAt && (
+                            <span className="task-countdown">
+                              deleting in{" "}
+                              {Math.max(
                                 0,
-                                Math.floor(
-                                  task.duration * 60 -
-                                    (now - task.inProgressAt) / 1000,
+                                Math.ceil(
+                                  (task.doneAt + DONE_DELETE_MS - now) / 1000,
                                 ),
-                              ),
+                              )}
+                              s
+                            </span>
+                          )}
+                          {task.status === "in-progress" &&
+                            task.duration &&
+                            task.inProgressAt && (
+                              <span className="task-timer">
+                                {formatCountdown(
+                                  Math.max(
+                                    0,
+                                    Math.floor(
+                                      task.duration * 60 -
+                                        (now - task.inProgressAt) / 1000,
+                                    ),
+                                  ),
+                                )}
+                              </span>
                             )}
-                          </span>
-                        )}
+                        </button>
+                      );
+                    })}
+                    <button
+                      className="kanban-add"
+                      onClick={() => handleAddRequest(col.key)}
+                    >
+                      + Add Task
                     </button>
-                  ))}
-                  <button
-                    className="kanban-add"
-                    onClick={() => handleAddRequest(col.key)}
-                  >
-                    + Add Task
-                  </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -213,8 +259,9 @@ export default function Board({ user, onLogout }) {
                       title: editingTask.title,
                       duration: editingTask.duration,
                       status: editingTask.status,
+                      priority: editingTask.priority,
                     }
-                  : { title: "", status: defaultStatus }
+                  : { title: "", status: defaultStatus, priority: 0 }
               }
             />
             {editingTask && (
@@ -270,8 +317,10 @@ export default function Board({ user, onLogout }) {
       )}
 
       <footer className="app-footer">
-        <span>{tasks.length} tasks</span>
-        <span>{tasks.filter((t) => t.status === "done").length} completed</span>
+        <span>{stats.total} tasks</span>
+        <span>{stats.inProgress} in progress</span>
+        <span>{stats.done} completed</span>
+        {query && <span>showing {visibleTasks.length} results</span>}
       </footer>
     </div>
   );

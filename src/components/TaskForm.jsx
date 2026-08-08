@@ -6,7 +6,14 @@ const STATUS_LABELS = {
   done: "Done",
 };
 
-const emptyForm = { title: "", duration: "", status: "todo" };
+const PRIORITY_OPTIONS = [
+  { value: 0, label: "None" },
+  { value: 1, label: "Low" },
+  { value: 2, label: "Medium" },
+  { value: 3, label: "High" },
+];
+
+const emptyForm = { title: "", duration: "", status: "todo", priority: 0 };
 
 function minutesToHm(minutes) {
   const h = Math.floor(minutes / 60);
@@ -91,6 +98,22 @@ export default function TaskForm({ onSubmit, onCancel, initial }) {
               onClick={() => setForm((prev) => ({ ...prev, status: key }))}
             >
               {label}
+            </button>
+          ))}
+        </div>
+      </label>
+
+      <label>
+        Priority
+        <div className="status-selector">
+          {PRIORITY_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`status-btn prio-${opt.value} ${form.priority === opt.value ? "active" : ""}`}
+              onClick={() => setForm((prev) => ({ ...prev, priority: opt.value }))}
+            >
+              {opt.label}
             </button>
           ))}
         </div>
