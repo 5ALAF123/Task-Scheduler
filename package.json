@@ -2,20 +2,23 @@
   "name": "task-scheduler",
   "private": true,
   "version": "1.0.0",
-  "engines": { "node": ">=23.4.0" },
+  "engines": { "node": ">=18.0.0" },
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k \"node --watch server/index.cjs\" \"vite\"",
-    "dev:server": "node --watch server/index.cjs",
+    "dev": "concurrently -k \"node --watch server/index.js\" \"vite\"",
+    "dev:server": "node --watch server/index.js",
     "dev:client": "vite",
     "build": "vite build",
-    "start": "node server/index.cjs"
+    "start": "node server/index.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "express-session": "^1.18.1",
     "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
