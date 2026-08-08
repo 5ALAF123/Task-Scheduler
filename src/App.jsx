@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import Auth from "./components/Auth";
 import Board from "./components/Board";
 
@@ -31,8 +32,18 @@ export default function App() {
   }
 
   if (!user) {
-    return <Auth onSuccess={setUser} />;
+    return (
+      <>
+        <Auth onSuccess={setUser} />
+        <Analytics />
+      </>
+    );
   }
 
-  return <Board user={user} onLogout={handleLogout} />;
+  return (
+    <>
+      <Board user={user} onLogout={handleLogout} />
+      <Analytics />
+    </>
+  );
 }
