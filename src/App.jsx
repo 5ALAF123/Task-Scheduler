@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react';
-import useTasks from './hooks/useTasks';
-import TaskForm from './components/TaskForm';
+import { useState, useCallback } from "react";
+import useTasks from "./hooks/useTasks";
+import TaskForm from "./components/TaskForm";
 
 const COLUMNS = [
-  { key: 'todo', label: 'To Do', css: 'col-todo' },
-  { key: 'in-progress', label: 'In Progress', css: 'col-progress' },
-  { key: 'done', label: 'Done', css: 'col-done' },
+  { key: "todo", label: "To Do", css: "col-todo" },
+  { key: "in-progress", label: "In Progress", css: "col-progress" },
+  { key: "done", label: "Done", css: "col-done" },
 ];
 
 function formatDuration(minutes) {
@@ -18,7 +18,7 @@ export default function App() {
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [defaultStatus, setDefaultStatus] = useState('todo');
+  const [defaultStatus, setDefaultStatus] = useState("todo");
 
   function handleAddRequest(status) {
     setEditingTask(null);
@@ -77,11 +77,11 @@ export default function App() {
               className={`kanban-col ${col.css}`}
               onDragOver={(e) => {
                 e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
+                e.dataTransfer.dropEffect = "move";
               }}
               onDrop={(e) => {
                 e.preventDefault();
-                const taskId = e.dataTransfer.getData('text/plain');
+                const taskId = e.dataTransfer.getData("text/plain");
                 if (taskId) handleDrop(taskId, col.key);
               }}
             >
@@ -96,14 +96,20 @@ export default function App() {
                     className={`task-card status-${task.status}`}
                     draggable="true"
                     onDragStart={(e) => {
-                      e.dataTransfer.setData('text/plain', task.id);
-                      e.dataTransfer.effectAllowed = 'move';
+                      e.dataTransfer.setData("text/plain", task.id);
+                      e.dataTransfer.effectAllowed = "move";
                     }}
                     onClick={() => handleTaskClick(task)}
                   >
                     <span className="task-title">{task.title}</span>
-                    {task.duration && <span className="task-duration-label">time</span>}
-                    {task.duration && <span className="task-duration">{formatDuration(task.duration)}</span>}
+                    {task.duration && (
+                      <span className="task-duration-label">time</span>
+                    )}
+                    {task.duration && (
+                      <span className="task-duration">
+                        {formatDuration(task.duration)}
+                      </span>
+                    )}
                   </button>
                 ))}
                 <button
@@ -131,7 +137,7 @@ export default function App() {
                       duration: editingTask.duration,
                       status: editingTask.status,
                     }
-                  : { title: '', duration: 60, status: defaultStatus }
+                  : { title: "", status: defaultStatus }
               }
             />
             {editingTask && (
@@ -147,7 +153,7 @@ export default function App() {
 
       <footer className="app-footer">
         <span>{tasks.length} tasks</span>
-        <span>{tasks.filter((t) => t.status === 'done').length} completed</span>
+        <span>{tasks.filter((t) => t.status === "done").length} completed</span>
       </footer>
     </div>
   );
