@@ -207,6 +207,22 @@ body {
   color: var(--text);
 }
 
+.delete-all-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.delete-all-btn {
+  padding: 10px 24px;
+  font-size: 0.9rem;
+}
+
+.confirm-text {
+  color: var(--text-dim);
+  margin: 8px 0 16px;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

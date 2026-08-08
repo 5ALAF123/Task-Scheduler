@@ -25,10 +25,11 @@ function formatCountdown(totalSeconds) {
 }
 
 export default function App() {
-  const { tasks, addTask, updateTask, deleteTask } = useTasks();
+  const { tasks, addTask, updateTask, deleteTask, deleteAllTasks } = useTasks();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [defaultStatus, setDefaultStatus] = useState("todo");
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -188,6 +189,46 @@ export default function App() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      <div className="delete-all-wrap">
+        <button
+          className="btn-danger delete-all-btn"
+          onClick={() => setConfirmDeleteAll(true)}
+        >
+          Delete All Tasks
+        </button>
+      </div>
+
+      {confirmDeleteAll && (
+        <div
+          className="modal-overlay"
+          onClick={() => setConfirmDeleteAll(false)}
+        >
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete All Tasks?</h3>
+            <p className="confirm-text">
+              Are you sure? This will permanently remove every task.
+            </p>
+            <div className="form-actions">
+              <button
+                className="btn-danger"
+                onClick={() => {
+                  deleteAllTasks();
+                  setConfirmDeleteAll(false);
+                }}
+              >
+                Delete All
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => setConfirmDeleteAll(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

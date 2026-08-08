@@ -141,6 +141,10 @@ export default function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  const deleteAllTasks = useCallback(() => {
+    setTasks([]);
+  }, []);
+
   const STATUS_CYCLE = { todo: 'in-progress', 'in-progress': 'done', done: 'todo' };
 
   const toggleStatus = useCallback((id) => {
@@ -153,5 +157,5 @@ export default function useTasks() {
     );
   }, []);
 
-  return { tasks, addTask, updateTask, deleteTask, toggleStatus };
+  return { tasks, addTask, updateTask, deleteTask, deleteAllTasks, toggleStatus };
 }
