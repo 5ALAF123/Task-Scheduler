@@ -30,6 +30,7 @@ export default function App() {
   const [editingTask, setEditingTask] = useState(null);
   const [defaultStatus, setDefaultStatus] = useState("todo");
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -61,6 +62,15 @@ export default function App() {
     },
     [editingTask, addTask, updateTask],
   );
+
+  function handleDeleteAllClick() {
+    if (tasks.length === 0) {
+      setDeleteError("There are no tasks to delete");
+      return;
+    }
+    setDeleteError("");
+    setConfirmDeleteAll(true);
+  }
 
   function handleCancel() {
     setShowForm(false);
@@ -196,10 +206,11 @@ export default function App() {
       <div className="delete-all-wrap">
         <button
           className="btn-danger delete-all-btn"
-          onClick={() => setConfirmDeleteAll(true)}
+          onClick={handleDeleteAllClick}
         >
           Delete All Tasks
         </button>
+        {deleteError && <p className="delete-error">{deleteError}</p>}
       </div>
 
       {confirmDeleteAll && (

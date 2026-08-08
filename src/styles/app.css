@@ -209,13 +209,20 @@ body {
 
 .delete-all-wrap {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin: 20px 0;
 }
 
 .delete-all-btn {
   padding: 10px 24px;
   font-size: 0.9rem;
+}
+
+.delete-error {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--danger, #dc2626);
 }
 
 .confirm-text {
