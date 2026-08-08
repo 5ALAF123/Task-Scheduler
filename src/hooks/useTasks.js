@@ -36,6 +36,7 @@ function generateId() {
 export default function useTasks() {
   const [tasks, setTasks] = useState(loadTasks);
   const scheduledDone = useRef(new Set());
+  const scheduledProgress = useRef(new Set());
   const timers = useRef(new Set());
 
   useEffect(() => {
@@ -88,6 +89,33 @@ export default function useTasks() {
         setTasks((prev) =>
           prev.filter((x) => !(x.id === t.id && x.status === 'done')),
         );
+      }, remaining);
+      timers.current.add(timer);
+    });
+  }, [tasks]);
+
+  useEffect(() => {
+    tasks.forEach((t) => {
+      if (t.status !== 'in-progress' || !t.duration || !t.inProgressAt) return;
+      const totalMs = t.duration * 60000;
+      const remaining = t.inProgressAt + totalMs - Date.now();
+      const moveToDone = (prev) =>
+        prev.map((x) =>
+          x.id === t.id && x.status === 'in-progress'
+            ? { ...x, status: 'done' }
+            : x,
+        );
+      if (remaining <= 0) {
+        scheduledProgress.current.delete(t.id);
+        setTasks(moveToDone);
+        return;
+      }
+      if (scheduledProgress.current.has(t.id)) return;
+      scheduledProgress.current.add(t.id);
+      const timer = setTimeout(() => {
+        scheduledProgress.current.delete(t.id);
+        timers.current.delete(timer);
+        setTasks(moveToDone);
       }, remaining);
       timers.current.add(timer);
     });
