@@ -33,7 +33,7 @@ export default function App() {
   const [deleteError, setDeleteError] = useState("");
   const [now, setNow] = useState(Date.now());
   const [theme, setTheme] = useState(
-    () => localStorage.getItem("task-scheduler-theme") || "light",
+    () => localStorage.getItem("task-scheduler-theme") || "dark",
   );
 
   useEffect(() => {
