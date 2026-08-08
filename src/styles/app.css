@@ -20,6 +20,7 @@
   --col-progress: #eab308;
   --col-done: #22c55e;
   --progress: #d97706;
+  --timer-color: #111827;
   --prio-low: #0ea5e9;
   --prio-medium: #eab308;
   --prio-high: #ef4444;
@@ -38,6 +39,7 @@
   --col-progress: #facc15;
   --col-done: #4ade80;
   --progress: #fb923c;
+  --timer-color: #ffffff;
   --prio-low: #38bdf8;
   --prio-medium: #facc15;
   --prio-high: #f87171;
@@ -279,8 +281,8 @@ body {
   font-size: 0.7rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--progress, #d97706);
-  border: 1px solid var(--progress, #d97706);
+  color: var(--timer-color, #111827);
+  border: 1px solid var(--timer-color, #111827);
   border-radius: 999px;
   padding: 2px 8px;
   align-self: flex-start;
